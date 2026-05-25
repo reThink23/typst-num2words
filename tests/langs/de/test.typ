@@ -90,11 +90,34 @@
     (101, "einhunderterste"),
     (800, "achthundertste"),
     (1000, "eintausendste"),
-
     // Compound.
     (8528321, "acht Millionen fünfhundertachtundzwanzigtausenddreihunderteinundzwanzigste"),
     (1000000, "eine Millionste"),
     (1000001, "eine Million erste"),
   ),
   form: "ordinal",
+)
+
+// Years
+#check(
+  convert,
+  (
+    (0, "null"),
+    (42, "zweiundvierzig"),
+    (800, "achthundert"),
+    (1000, "eintausend"),
+    (1099, "eintausendneunundneunzig"),
+    (1100, "elfhundert"),
+    (1900, "neunzehnhundert"),
+    (1901, "neunzehnhunderteins"),
+    (1999, "neunzehnhundertneunundneunzig"),
+    (2000, "zweitausend"),
+    (2001, "zweitausendeins"),
+    (2009, "zweitausendneun"),
+    (2010, "zweitausendzehn"),
+    (2024, "zweitausendvierundzwanzig"),
+    (-1999, "minus neunzehnhundertneunundneunzig"),
+    (10001, "zehntausendeins"),
+  ),
+  form: "year",
 )
