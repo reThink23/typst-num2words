@@ -112,8 +112,14 @@
 ///
 /// - word (str): The word from scales to be pluralized
 /// -> str
-#let _pluralize-scale(word) = if word.last() == "n" { word + "en" } else if word.last() == "e" { word + "n" } else {
-  word
+#let _pluralize-scale(word) = {
+  return if word.last() == "n" {
+    word + "en"
+  } else if word.last() == "e" {
+    word + "n"
+  } else {
+    word
+  }
 }
 
 
@@ -181,7 +187,8 @@
   }
 }
 
-/// Converts a number in the range 1,000,000–10^63 (3*_scales.len()-1)
+/// Converts a number upwards of 1,000,000
+// (until scale has no more entries)
 ///
 /// - number (int): The number to convert (1,000,000–10^63)
 /// -> str
@@ -208,6 +215,7 @@
 
   errors.out-of-range(groups.len() - 1, max: _scales.len() - 1, lang: _lang-code)
 
+  groups = groups.rev()
   let parts = ()
 
   for (idx, val) in groups.enumerate() {
@@ -225,7 +233,7 @@
         words = "eine"
       }
 
-      if val > 1 {
+      if val != 1 {
         scale = _pluralize-scale(scale)
       }
 
@@ -296,7 +304,13 @@
 #let _ordinalize(word) = {
   return if word in _ordinal-irregulars {
     _ordinal-irregulars.at(word)
-  } else if word.ends-with("ig") or word.ends-with("on") or word.ends-with("hundert") or word.ends-with("tausend") {
+  } else if (
+    word.ends-with("ig")
+      or word.ends-with("hundert")
+      or word.ends-with("tausend")
+      or word.ends-with("ion")
+      or word.ends-with("ard")
+  ) {
     word + "ste"
   } else {
     word + "te"
@@ -317,10 +331,10 @@
     new-last = _ordinal-irregulars.at(last)
   } else {
     let found-irregular = false
-    for (key, val) in _ordinal-irregulars {
-      if last.ends-with(key) {
-        let base = last.slice(0, last.len() - key.len())
-        new-last = base + val
+    for (card, ord) in _ordinal-irregulars {
+      if last.ends-with(card) {
+        let base = last.slice(0, last.len() - card.len())
+        new-last = base + ord
         found-irregular = true
         break
       }
