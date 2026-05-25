@@ -9,7 +9,7 @@
 /// Words for numbers 0–19.
 #let _units = (
   "null",
-  "eins",
+  "ein",
   "zwei",
   "drei",
   "vier",
@@ -94,6 +94,20 @@
 
 // Cardinal helpers.
 
+
+/// Helper function to handle "eins" to "ein" conversion based on position.
+///
+/// - word (str): The word to process.
+/// - is-first (bool): Whether this is the first part of a compound number.
+/// -> str
+#let _handle-eins(word, is-first: true) = {
+  if word == "eins" and is-first {
+    "ein"
+  } else {
+    word
+  }
+}
+
 /// Pluralize the scale
 ///
 /// - word (str): The word from scales to be pluralized
@@ -109,7 +123,9 @@
 /// - number (int): The number to convert (1–99).
 /// -> str
 #let _convert-below-100(number) = {
-  if number < 20 {
+  if number == 1 {
+    return "eins"
+  } else if number < 20 {
     return _units.at(number)
   }
 
@@ -119,9 +135,9 @@
   if units-digit == 0 {
     return _tens.at(tens-digit - 2)
   } else if tens-digit == 0 {
-    return _units.at(units-digit).replace("eins", "ein")
+    return _handle-eins(_units.at(units-digit))
   } else {
-    return _units.at(units-digit).replace("eins", "ein") + "und" + _tens.at(tens-digit - 2)
+    return _handle-eins(_units.at(units-digit)) + "und" + _tens.at(tens-digit - 2)
   }
 }
 
@@ -139,10 +155,10 @@
       if hundreds-digit == 1 {
         "einhundert"
       } else {
-        _units.at(hundreds-digit).replace("eins", "ein") + "hundert"
+        _handle-eins(_units.at(hundreds-digit)) + "hundert"
       }
     } else {
-      _units.at(hundreds-digit).replace("eins", "ein") + "hundert" + _convert-below-100(remainder)
+      _handle-eins(_units.at(hundreds-digit)) + "hundert" + _convert-below-100(remainder)
     }
   }
 }
@@ -158,9 +174,9 @@
     _convert-below-1000(below-thousands)
   } else {
     if below-thousands == 0 {
-      _convert-below-1000(thousands).replace("eins", "ein") + "tausend"
+      _handle-eins(_convert-below-1000(thousands)) + "tausend"
     } else {
-      _convert-below-1000(thousands).replace("eins", "ein") + "tausend" + _convert-below-1000(below-thousands)
+      _handle-eins(_convert-below-1000(thousands)) + "tausend" + _convert-below-1000(below-thousands)
     }
   }
 }
@@ -200,7 +216,7 @@
     if idx == 0 {
       parts.push(_convert-below-1000(val))
     } else if idx == 1 {
-      parts.push(_convert-below-1000(val).replace("eins", "ein") + "tausend")
+      parts.push(_convert-below-1000(val) + "tausend")
     } else {
       let scale = _scales.at(idx)
       let words = _convert-below-1000(val)
