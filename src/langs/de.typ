@@ -89,7 +89,7 @@
 )
 
 /// Supported forms for this language module.
-#let _supported-forms = ("cardinal", "ordinal")
+#let _supported-forms = ("cardinal", "ordinal", "year")
 
 
 // Cardinal helpers.
@@ -364,21 +364,15 @@
 /// - number (int): The number to convert (>= 1).
 /// -> str
 #let _convert-year(number) = {
-  if number < 1000 {
-    return _convert-cardinal(number)
-  } else if number < 10000 {
-    let high = calc.quo(number, 100)
-    let low = calc.rem(number, 100)
-    if calc.rem(number, 1000) == 0 {
-      _convert-cardinal(number)
-    } else if low == 0 {
-      _convert-below-100(high) + " hundred"
-    } else if high == 20 and low < 10 {
-      "two thousand " + _convert-below-100(low)
-    } else if low < 10 {
-      _convert-below-100(high) + " oh " + _units.at(low)
+  let high = calc.quo(number, 100)
+  let low = calc.rem(number, 100)
+  return if high >= 20 or high < 11 {
+    _convert-below-million(number)
+  } else {
+    if low == 0 {
+      _convert-below-100(high) + "hundert"
     } else {
-      _convert-below-100(high) + " " + _convert-below-100(low)
+      _convert-below-100(high) + "hundert" + _convert-below-100(low)
     }
   } else {
     _convert-cardinal(number)
