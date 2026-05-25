@@ -3,11 +3,13 @@
 #import "langs/en.typ"
 #import "langs/es.typ"
 #import "langs/ca.typ"
+#import "langs/de.typ"
 
 #let converters = (
   en: en.convert,
   es: es.convert,
   ca: ca.convert,
+  de: de.convert,
 )
 
 /// Validates the shape of a `fallback` argument and normalizes it to an array. Accepts a single string, a single
