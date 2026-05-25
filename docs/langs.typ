@@ -8,3 +8,5 @@ language-specific features.
 #include "langs/es.typ"
 
 #include "langs/ca.typ"
+
+#include "langs/de.typ"

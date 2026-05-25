@@ -36,3 +36,7 @@
 === Catalan
 
 #show-lang-module("ca")
+
+=== German
+
+#show-lang-module("de")
