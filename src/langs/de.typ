@@ -211,8 +211,6 @@
     groups.push(int(str-number.slice(i, count: 3)))
   }
 
-  groups = groups.rev()
-
   errors.out-of-range(groups.len() - 1, max: _scales.len() - 1, lang: _lang-code)
 
   groups = groups.rev()
@@ -242,48 +240,6 @@
   }
 
   return parts.rev().join("").trim()
-
-  // for i in range(start,num-groups) {
-  //   // start from last group
-  //   let crt-thousands = int(str-number.slice(-3 * i, count: 3))
-  //   let crt-scale = _scales.at(i+1) // if crt-thousands == 1 {_scales.at(i)} else {_pluralize-scale(_scales.at(i))}
-  //   let d = _convert-below-1000(crt-thousands)
-  //   if crt-thousands != 0 {
-  //     parts.push(d)
-  //   }
-  //   parts.push(crt-scale)
-  // }
-  // parts.push(_convert-below-1000(int(str-number.slice(0,highest-group-len))).replace("eins", "eine"))
-  // // // calculates length correctly by log10 and considering power of 10 has one more digit than detected
-  // // let lg = calc.log(calc.abs(number))
-  // // let len-digits = calc.ceil(lg) + if calc.rem(lg, 1) == 0 {1} else {0}
-  // return parts.rev().join(" ")
-}
-
-/// Recursively splits a number into 3-digit chunks and converts each chunk,
-/// appending the appropriate scale word.
-///
-/// - number (int): The remaining number to convert.
-/// - scale-index (int): The current scale index (0 = units, 1 = thousands, etc.).
-/// -> array
-#let _chunk-and-convert(number, scale-index) = {
-  if number == 0 {
-    ()
-  } else {
-    errors.out-of-range(scale-index, max: _scales.len() - 1, lang: _lang-code)
-    let chunk = calc.rem(number, 1000)
-    let rest = calc.quo(number, 1000)
-    let higher = _chunk-and-convert(rest, scale-index + 1)
-    if chunk == 0 {
-      higher
-    } else {
-      let words = _convert-below-1000(chunk)
-      if scale-index > 0 {
-        words = words + " " + _scales.at(scale-index)
-      }
-      higher + (words,)
-    }
-  }
 }
 
 /// Converts a positive integer to its cardinal word form.
@@ -292,7 +248,6 @@
 /// -> str
 #let _convert-cardinal(number) = {
   return _convert-above-million(number)
-  // return _chunk-and-convert(number, 0).join(" ")
 }
 
 // Ordinal helpers.
@@ -374,8 +329,6 @@
     } else {
       _convert-below-100(high) + "hundert" + _convert-below-100(low)
     }
-  } else {
-    _convert-cardinal(number)
   }
 }
 
