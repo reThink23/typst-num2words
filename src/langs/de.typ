@@ -54,12 +54,12 @@
   "Trilliarde",
   "Quadrillion",
   "Quadrilliarde",
-  "Quntillion",
+  "Quintillion",
   "Quintilliarde",
   "Sextillion",
   "Sextilliarde",
-  "Heptillion",
-  "Heptilliarde",
+  "Septillion",
+  "Septilliarde",
   "Oktillion",
   "Oktilliarde",
   "Nonillion",
@@ -84,10 +84,6 @@
   zwölf: "zwölfte",
 )
 
-#let _hundred-irregulars = (
-  eins: "einhundert",
-)
-
 /// Supported forms for this language module.
 #let _supported-forms = ("cardinal", "ordinal", "year")
 
@@ -95,13 +91,12 @@
 // Cardinal helpers.
 
 
-/// Helper function to handle "eins" to "ein" conversion based on position.
+/// Helper function to handle the "eins" to "ein" conversion used in compounds.
 ///
 /// - word (str): The word to process.
-/// - is-first (bool): Whether this is the first part of a compound number.
 /// -> str
-#let _handle-eins(word, is-first: true) = {
-  if word == "eins" and is-first {
+#let _handle-eins(word) = {
+  if word == "eins" {
     "ein"
   } else {
     word
@@ -195,7 +190,6 @@
 #let _convert-above-million(number) = {
   let str-number = str(number)
   let len-digits = str-number.len()
-  let num-groups = calc.quo(len-digits, 3)
   let highest-group-len = calc.rem(len-digits, 3)
 
   if len-digits < 7 {
@@ -222,7 +216,7 @@
     if idx == 0 {
       parts.push(_convert-below-1000(val))
     } else if idx == 1 {
-      parts.push(_convert-below-1000(val) + "tausend")
+      parts.push(_handle-eins(_convert-below-1000(val)) + "tausend")
     } else {
       let scale = _scales.at(idx)
       let words = _convert-below-1000(val)
@@ -273,7 +267,7 @@
 }
 
 /// Transforms a full cardinal string into its ordinal form by ordinalizing
-/// only the last word (handling hyphenated compounds like "forty-two").
+/// only the last word, accounting for cardinal endings that are irregular.
 ///
 /// - cardinal (str): The cardinal string to transform.
 /// -> str
