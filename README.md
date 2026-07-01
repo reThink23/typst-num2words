@@ -23,7 +23,6 @@ Check out the [package manual][manual] for detailed documentation. Here's a quic
 // Some languages have different number forms
 #num2words(1, lang: "en", form: "ordinal") // "first"
 #num2words(1, lang: "es", form: "ordinal") // "primero"
-#num2words(1, lang: "de", form: "ordinal") // "erste"
 ```
 
 The `num2words` function _always_ accepts:
