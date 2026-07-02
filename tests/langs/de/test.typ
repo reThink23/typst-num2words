@@ -93,10 +93,12 @@
     (101, "einhunderterste"),
     (800, "achthundertste"),
     (1000, "eintausendste"),
-    // Compound.
-    (8528321, "acht Millionen fünfhundertachtundzwanzigtausenddreihunderteinundzwanzigste"),
-    (1000000, "eine Millionste"),
-    (1000001, "eine Million erste"),
+    // Millions and beyond: lowercase, written as a single word (Duden K 65).
+    (1000000, "millionste"),
+    (2000000, "zweimillionste"),
+    (1000000000, "milliardste"),
+    (1000001, "millionerste"),
+    (8528321, "achtmillionenfünfhundertachtundzwanzigtausenddreihunderteinundzwanzigste"),
   ),
   form: "ordinal",
 )

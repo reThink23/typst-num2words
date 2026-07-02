@@ -266,35 +266,78 @@
   }
 }
 
-/// Transforms a full cardinal string into its ordinal form by ordinalizing
-/// only the last word, accounting for cardinal endings that are irregular.
+/// Ordinal forms of the scale words, keyed by both their singular and plural
+/// cardinal spelling (lowercased). Used when the last word of a cardinal is a
+/// scale noun, as in exact multiples like "zweimillionste" or "milliardste".
+#let _scale-ordinals = {
+  let table = (hundert: "hundertste")
+  for scale in _scales {
+    if scale == "" { continue }
+    let singular = lower(scale)
+    let ordinal = if singular.ends-with("e") {
+      singular.slice(0, -1) + "ste"
+    } else {
+      singular + "ste"
+    }
+    table.insert(singular, ordinal)
+    table.insert(_pluralize-scale(singular), ordinal)
+  }
+  table
+}
+
+/// Ordinalizes a single word, applying irregular cardinal endings (e.g. the
+/// "eins" in "einhunderteins" becoming "erste").
+///
+/// - word (str): The word to ordinalize.
+/// -> str
+#let _ordinalize-last(word) = {
+  if word in _ordinal-irregulars {
+    return _ordinal-irregulars.at(word)
+  }
+  for (card, ord) in _ordinal-irregulars {
+    if word.ends-with(card) {
+      return word.slice(0, word.len() - card.len()) + ord
+    }
+  }
+  return _ordinalize(word)
+}
+
+/// Transforms a full cardinal string (below one million, so always a single
+/// word) into its ordinal form by ordinalizing its last (only) word.
 ///
 /// - cardinal (str): The cardinal string to transform.
 /// -> str
 #let _cardinal-to-ordinal(cardinal) = {
   let tokens = cardinal.split(" ")
+  let new-last = _ordinalize-last(tokens.last())
+  return (tokens.slice(0, -1) + (new-last,)).join(" ")
+}
+
+/// Transforms the cardinal of a number >= 1,000,000 into its ordinal form.
+/// German writes such ordinals lowercase and as a single word (Duden K 65),
+/// so the scale nouns are lowercased and every space is removed.
+///
+/// - cardinal (str): The cardinal string to transform.
+/// -> str
+#let _cardinal-to-ordinal-large(cardinal) = {
+  let tokens = lower(cardinal).split(" ")
+
+  // A leading "eine" marks an exact one of the highest scale (e.g. one million);
+  // it is dropped so that 10^6 reads "millionste" rather than "einemillionste".
+  if tokens.first() == "eine" {
+    tokens = tokens.slice(1)
+  }
+  // Any other "eine" only appears inside a compound, where it joins as "ein".
+  tokens = tokens.map(token => if token == "eine" { "ein" } else { token })
+
   let last = tokens.last()
-  let new-last = ""
-
-  if last in _ordinal-irregulars {
-    new-last = _ordinal-irregulars.at(last)
+  let new-last = if last in _scale-ordinals {
+    _scale-ordinals.at(last)
   } else {
-    let found-irregular = false
-    for (card, ord) in _ordinal-irregulars {
-      if last.ends-with(card) {
-        let base = last.slice(0, last.len() - card.len())
-        new-last = base + ord
-        found-irregular = true
-        break
-      }
-    }
-
-    if not found-irregular {
-      new-last = _ordinalize(last)
-    }
+    _ordinalize-last(last)
   }
 
-  return (tokens.slice(0, -1) + (new-last,)).join(" ")
+  return (tokens.slice(0, -1) + (new-last,)).join("")
 }
 
 /// Converts a positive integer to its ordinal word form.
@@ -303,7 +346,11 @@
 /// -> str
 #let _convert-ordinal(number) = {
   let cardinal = _convert-cardinal(number)
-  return _cardinal-to-ordinal(cardinal)
+  return if number < 1000000 {
+    _cardinal-to-ordinal(cardinal)
+  } else {
+    _cardinal-to-ordinal-large(cardinal)
+  }
 }
 
 // Year helpers.
